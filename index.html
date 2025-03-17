@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Job Application Tracker</title>
+  <style>
+    :root {
+      --primary: #4a6fa5;
+      --primary-light: #6e8cbb;
+      --secondary: #ff9a3c;
+      --light: #f5f5f5;
+      --dark: #333;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --gray: #6c757d;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #000000;  /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    body {
+      background-color: #f9f9f9;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .title {
+      font-size: 1.8rem;
+      color: var(--primary);
+    }
+    
+    button {
+      padding: 8px 16px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-light);
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 10px 0;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+      font-size: 0.9rem;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: transparent;
+      border: none;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--primary);
+      color: var(--primary);
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .applications-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .applications-list th, .applications-list td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .applications-list th {
+      background-color: var(--light);
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+      font-weight: 600;
+    }
+    
+    .applications-list tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .applications-list .status {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status.applied {
+      background-color: #e0e0ff;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .status.interview {
+      background-color: #fff2d6;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .status.offer {
+      background-color: #d1f7dd;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .status.rejected {
+      background-color: #ffe0e0;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .action-buttons button {
+      padding: 5px 8px;
+      font-size: 0.8rem;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .modal-header h2 {
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .close {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #000000; /* Zmieniono kolor czcionki na czarny */
+    }
+    
+    .form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      
+      .applications-list {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">Job Application Tracker</h1>
+      <button id="addApplicationBtn">+ Dodaj aplikację</button>
+    </div>
+    
+    <div class="dashboard">
+      <div class="stat-card">
+        <div class="stat-number" id="totalApplications">0</div>
+        <div class="stat-label">Wszystkie aplikacje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="interviewCount">0</div>
+        <div class="stat-label">Zaproszenia na rozmowę</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="offerCount">0</div>
+        <div class="stat-label">Oferty pracy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="responseRate">0%</div>
+        <div class="stat-label">Wskaźnik odpowiedzi</div>
+      </div>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="all">Wszystkie</button>
+      <button class="tab" data-tab="applied">Aplikacja wysłana</button>
+      <button class="tab" data-tab="interview">Etap rozmowy</button>
+      <button class="tab" data-tab="offer">Otrzymana oferta</button>
+      <button class="tab" data-tab="rejected">Odrzucone</button>
+    </div>
+    
+    <div class="tab-content">
+      <table class="applications-list">
+        <thead>
+          <tr>
+            <th>Firma</th>
+            <th>Stanowisko</th>
+            <th>Data aplikacji</th>
+            <th>Status</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody id="applicationsTableBody">
+          <!-- Dynamic content will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Add/Edit Application Modal -->
+  <div class="modal" id="applicationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Dodaj nową aplikację</h2>
+        <span class="close">&times;</span>
+      </div>
+      <form id="applicationForm">
+        <input type="hidden" id="applicationId">
+        <div class="form-group">
+          <label for="company">Nazwa firmy</label>
+          <input type="text" id="company" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="position">Stanowisko</label>
+          <input type="text" id="position" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="applicationDate">Data aplikacji</label>
+          <input type="date" id="applicationDate" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" class="form-control" required>
+            <option value="applied">Aplikacja wysłana</option>
+            <option value="interview">Etap rozmowy</option>
+            <option value="offer">Otrzymana oferta</option>
+            <option value="rejected">Odrzucone</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="notes">Notatki</label>
+          <textarea id="notes" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-buttons">
+          <button type="button" class="btn-warning" id="cancelBtn">Anuluj</button>
+          <button type="submit" class="btn-success" id="saveBtn">Zapisz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Delete Confirmation Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Potwierdź usunięcie</h2>
+        <span class="close">&times;</span>
+      </div>
+      <p>Czy na pewno chcesz usunąć tę aplikację?</p>
+      <input type="hidden" id="deleteApplicationId">
+      <div class="form-buttons">
+        <button type="button" class="btn-warning" id="cancelDeleteBtn">Anuluj</button>
+        <button type="button" class="btn-danger" id="confirmDeleteBtn">Usuń</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Local storage key
+    const STORAGE_KEY = 'jobApplications';
+    
+    // DOM Elements
+    const addApplicationBtn = document.getElementById('addApplicationBtn');
+    const applicationModal = document.getElementById('applicationModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const applicationForm = document.getElementById('applicationForm');
+    const applicationsTableBody = document.getElementById('applicationsTableBody');
+    const tabs = document.querySelectorAll('.tab');
+    const closeButtons = document.querySelectorAll('.close');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Stats elements
+    const totalApplicationsEl = document.getElementById('totalApplications');
+    const interviewCountEl = document.getElementById('interviewCount');
+    const offerCountEl = document.getElementById('offerCount');
+    const responseRateEl = document.getElementById('responseRate');
+    
+    // Form fields
+    const applicationIdInput = document.getElementById('applicationId');
+    const companyInput = document.getElementById('company');
+    const positionInput = document.getElementById('position');
+    const applicationDateInput = document.getElementById('applicationDate');
+    const statusInput = document.getElementById('status');
+    const notesInput = document.getElementById('notes');
+    const deleteApplicationIdInput = document.getElementById('deleteApplicationId');
+    
+    // Active filter
+    let activeFilter = 'all';
+    
+    // Load applications from local storage
+    let applications = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    
+    // Initialize date input to today
+    applicationDateInput.valueAsDate = new Date();
+    
+    // Event Listeners
+    addApplicationBtn.addEventListener('click', openAddModal);
+    applicationForm.addEventListener('submit', saveApplication);
+    confirmDeleteBtn.addEventListener('click', deleteApplication);
+    cancelBtn.addEventListener('click', closeModal);
+    cancelDeleteBtn.addEventListener('click', closeModal);
+    
+    closeButtons.forEach(button => {
+      button.addEventListener('click', closeModal);
+    });
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        // Set active filter
+        activeFilter = tab.dataset.tab;
+        // Render applications with new filter
+        renderApplications();
+      });
+    });
+    
+    // Initialize
+    renderApplications();
+    updateStats();
+    
+    // Functions
+    function renderApplications() {
+      // Clear table
+      applicationsTableBody.innerHTML = '';
+      
+      // Filter applications based on active tab
+      const filteredApplications = applications.filter(app => {
+        if (activeFilter === 'all') return true;
+        return app.status === activeFilter;
+      });
+      
+      // Sort applications by date (newest first)
+      filteredApplications.sort((a, b) => new Date(b.applicationDate) - new Date(a.applicationDate));
+      
+      if (filteredApplications.length === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+          <td colspan="5" style="text-align: center; padding: 20px;">
+            Brak aplikacji do wyświetlenia
+          </td>
+        `;
+        applicationsTableBody.appendChild(emptyRow);
+        return;
+      }
+      
+      // Create table rows
+      filteredApplications.forEach(app => {
+        const row = document.createElement('tr');
+        
+        // Format date
+        const date = new Date(app.applicationDate);
+        const formattedDate = date.toLocaleDateString('pl-PL');
+        
+        // Status text
+        let statusText = '';
+        let statusClass = '';
+        
+        switch (app.status) {
+          case 'applied':
+            statusText = 'Aplikacja wysłana';
+            statusClass = 'applied';
+            break;
+          case 'interview':
+            statusText = 'Etap rozmowy';
+            statusClass = 'interview';
+            break;
+          case 'offer':
+            statusText = 'Otrzymana oferta';
+            statusClass = 'offer';
+            break;
+          case 'rejected':
+            statusText = 'Odrzucone';
+            statusClass = 'rejected';
+            break;
+        }
+        
+        row.innerHTML = `
+          <td>${app.company}</td>
+          <td>${app.position}</td>
+          <td>${formattedDate}</td>
+          <td><span class="status ${statusClass}">${statusText}</span></td>
+          <td class="action-buttons">
+            <button class="edit-btn" data-id="${app.id}">Edytuj</button>
+            <button class="delete-btn btn-danger" data-id="${app.id}">Usuń</button>
+          </td>
+        `;
+        
+        applicationsTableBody.appendChild(row);
+      });
+      
+      // Add event listeners to edit and delete buttons
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+      });
+      
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDeleteModal(btn.dataset.id));
+      });
+    }
+    
+    function updateStats() {
+      // Total applications
+      totalApplicationsEl.textContent = applications.length;
+      
+      // Interview count
+      const interviewCount = applications.filter(app => app.status === 'interview').length;
+      interviewCountEl.textContent = interviewCount;
+      
+      // Offer count
+      const offerCount = applications.filter(app => app.status === 'offer').length;
+      offerCountEl.textContent = offerCount;
+      
+      // Response rate (interview or offer or rejected / total)
+      const responsesCount = applications.filter(app => app.status !== 'applied').length;
+      const responseRate = applications.length > 0 
+        ? Math.round((responsesCount / applications.length) * 100) 
+        : 0;
+      responseRateEl.textContent = `${responseRate}%`;
+    }
+    
+    function openAddModal() {
+      modalTitle.textContent = 'Dodaj nową aplikację';
+      applicationForm.reset();
+      applicationDateInput.valueAsDate = new Date();
+      applicationIdInput.value = '';
+      applicationModal.classList.add('show');
+    }
+    
+    function openEditModal(id) {
+      const application = applications.find(app => app.id === id);
+      if (application) {
+        modalTitle.textContent = 'Edytuj aplikację';
+        applicationIdInput.value = application.id;
+        companyInput.value = application.company;
+        positionInput.value = application.position;
+        applicationDateInput.value = application.applicationDate;
+        statusInput.value = application.status;
+        notesInput.value = application.notes || '';
+        applicationModal.classList.add('show');
+      }
+    }
+    
+    function openDeleteModal(id) {
+      deleteApplicationIdInput.value = id;
+      deleteModal.classList.add('show');
+    }
+    
+    function closeModal() {
+      applicationModal.classList.remove('show');
+      deleteModal.classList.remove('show');
+    }
+    
+    function saveApplication(e) {
+      e.preventDefault();
+      
+      const id = applicationIdInput.value || Date.now().toString();
+      const newApplication = {
+        id,
+        company: companyInput.value,
+        position: positionInput.value,
+        applicationDate: applicationDateInput.value,
+        status: statusInput.value,
+        notes: notesInput.value
+      };
+      
+      if (applicationIdInput.value) {
+        // Update existing application
+        const index = applications.findIndex(app => app.id === id);
+        if (index !== -1) {
+          applications[index] = newApplication;
+        }
+      } else {
+        // Add new application
+        applications.push(newApplication);
+      }
+      
+      // Save to local storage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
+      
+      // Update UI
+      renderApplications();
+      updateStats();
+      closeModal();
+    }
+    
+    function deleteApplication() {
+      const id = deleteApplicationIdInput.value;
+      applications = applications.filter(app => app.id !== id);
+      
+      // Save to local storage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
+      
+      // Update UI
+      renderApplications();
+      updateStats();
+      closeModal();
+    }
+  </script>
+</body>
+</html>
